@@ -5,7 +5,6 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -14,10 +13,6 @@ import { JwtModule } from '@nestjs/jwt';
     PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
-    }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '3h' },
     }),
   ],
   controllers: [AppController],
