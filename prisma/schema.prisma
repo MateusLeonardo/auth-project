@@ -8,7 +8,40 @@ generator client {
 }
 
 model Users {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
+  id         String       @id @default(uuid())
+  email      String       @unique
+  password   String
+  userBoards UserBoards[]
+}
+
+model Boards {
+  id         String       @id @default(uuid())
+  name       String
+  columns    Columns[]
+  userBoards UserBoards[]
+}
+
+model UserBoards {
+  userId  String
+  boardId String
+  user    Users  @relation(fields: [userId], references: [id])
+  board   Boards @relation(fields: [boardId], references: [id])
+
+  @@id([userId, boardId])
+}
+
+model Columns {
+  id      String  @id @default(uuid())
+  name    String
+  tasks   Tasks[]
+  boardId String
+  board   Boards  @relation(fields: [boardId], references: [id])
+}
+
+model Tasks {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  columnId    String
+  column      Columns @relation(fields: [columnId], references: [id])
 }
