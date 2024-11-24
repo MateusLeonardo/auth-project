@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +12,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/decorators/user.decorator';
+import { ParamId } from 'src/decorators/param-id.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('boards')
@@ -30,21 +30,21 @@ export class BoardsController {
   }
 
   @Get(':id')
-  findOne(@User() user, @Param('id') id: string) {
+  findOne(@User() user, @ParamId() id: string) {
     return this.boardsService.findOne(user, id);
   }
 
   @Patch(':id')
   update(
     @User() user,
-    @Param('id') id: string,
+    @ParamId() id: string,
     @Body() updateBoardDto: UpdateBoardDto,
   ) {
     return this.boardsService.update(user, id, updateBoardDto);
   }
 
   @Delete(':id')
-  remove(@User() user, @Param('id') id: string) {
+  remove(@User() user, @ParamId() id: string) {
     return this.boardsService.remove(user, id);
   }
 }
