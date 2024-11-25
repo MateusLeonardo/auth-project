@@ -10,6 +10,26 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class BoardsService {
   constructor(private prismaService: PrismaService) {}
+
+  private async validateUserBoard(userId: string, boardId: string) {
+    const board = await this.prismaService.boards.findFirst({
+      where: {
+        id: boardId,
+        userBoards: {
+          some: { userId },
+        },
+      },
+    });
+
+    if (!board) {
+      throw new NotFoundException(
+        'Você não tem acesso a este board ou ele não existe',
+      );
+    }
+
+    return board;
+  }
+
   async create(user: any, { name }: CreateBoardDto) {
     const existsBoard = await this.prismaService.boards.findFirst({
       where: {
@@ -26,16 +46,21 @@ export class BoardsService {
       throw new ConflictException('Board já existe');
     }
 
-    await this.prismaService.boards.create({
-      data: {
-        name,
-        userBoards: {
-          create: {
-            userId: user.id,
+    try {
+      return this.prismaService.boards.create({
+        data: {
+          name,
+          userBoards: {
+            create: {
+              userId: user.id,
+            },
           },
         },
-      },
-    });
+      });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new ConflictException('Erro ao criar board');
+    }
   }
 
   async findAll(user: any) {
@@ -51,46 +76,16 @@ export class BoardsService {
   }
 
   async findOne(user: any, id: string) {
-    const board = await this.prismaService.boards.findFirst({
-      where: {
-        id,
-        userBoards: {
-          some: {
-            userId: user.id,
-          },
-        },
-      },
-    });
-
-    if (!board) {
-      throw new NotFoundException('Board não encontrado');
-    }
-
-    return board;
+    return this.validateUserBoard(user.id, id);
   }
 
   async update(user: any, id: string, { name }: UpdateBoardDto) {
-    const board = await this.prismaService.boards.findFirst({
-      where: {
-        id,
-        userBoards: {
-          some: {
-            userId: user.id,
-          },
-        },
-      },
-    });
-
-    if (!board) {
-      throw new NotFoundException('Board não encontrado');
-    }
+    await this.validateUserBoard(user.id, id);
 
     const existingBoard = await this.prismaService.boards.findFirst({
       where: {
         name,
-        id: {
-          not: id,
-        },
+        id: { not: id },
         userBoards: {
           some: {
             userId: user.id,
@@ -110,23 +105,17 @@ export class BoardsService {
   }
 
   async remove(user: any, id: string) {
-    const existingBoard = await this.prismaService.boards.findFirst({
-      where: {
-        id,
-        userBoards: {
-          some: {
-            userId: user.id,
-          },
-        },
-      },
-    });
+    await this.validateUserBoard(user.id, id);
 
-    if (!existingBoard) {
-      throw new NotFoundException('Board não encontrado');
+    try {
+      await this.prismaService.boards.delete({
+        where: { id },
+      });
+
+      return { message: 'Board deletado com sucesso' };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new ConflictException('Erro ao deletar board');
     }
-
-    await this.prismaService.boards.delete({
-      where: { id },
-    });
   }
 }
