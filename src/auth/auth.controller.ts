@@ -9,7 +9,7 @@ import {
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { AuthRegisterDTO } from './dto/auth-register.dto';
+import { AuthRegisterDto } from './dto/auth-register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,8 +22,8 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() authRegisterDTO: AuthRegisterDTO) {
-    return this.authService.register(authRegisterDTO);
+  async register(@Body() authRegisterDto: AuthRegisterDto) {
+    return this.authService.register(authRegisterDto);
   }
 
   @UseGuards(JwtAuthGuard)
