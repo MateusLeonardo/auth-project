@@ -1,19 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { BoardOwnershipGuard } from 'src/boards/guards/board-ownership.guard';
+import { ParamId } from 'src/decorators/param-id.decorator';
+import { User } from 'src/decorators/user.decorator';
 import { ColumnsService } from './columns.service';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
-import { ParamId } from 'src/decorators/param-id.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { BoardOwnershipGuard } from 'src/boards/guards/board-ownership.guard';
+import { ColumnOwnershipGuard } from './guards/column-ownership.guard';
 
 @UseGuards(JwtAuthGuard, BoardOwnershipGuard)
 @Controller('boards/:boardId/columns')
@@ -29,22 +30,26 @@ export class ColumnsController {
   }
 
   @Get()
-  findAll() {
-    return this.columnsService.findAll();
+  findAll(@User() user, @ParamId('boardId') boardId: string) {
+    return this.columnsService.findAll(user, boardId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.columnsService.findOne(+id);
+  @Get(':columnId')
+  @UseGuards(ColumnOwnershipGuard)
+  findOne(@ParamId('columnId') columnId: string) {
+    return this.columnsService.findOne(columnId);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateColumnDto: UpdateColumnDto) {
-    return this.columnsService.update(+id, updateColumnDto);
+  update(
+    @ParamId('columnId') columnId: string,
+    @Body() updateColumnDto: UpdateColumnDto,
+  ) {
+    return this.columnsService.update(columnId, updateColumnDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.columnsService.remove(+id);
+  remove(@ParamId('columnId') columnId: string) {
+    return this.columnsService.remove(columnId);
   }
 }

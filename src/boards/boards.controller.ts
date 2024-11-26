@@ -30,21 +30,24 @@ export class BoardsController {
     return this.boardsService.findAll(user);
   }
 
-  @Get(':id')
+  @Get(':boardId')
   @UseGuards(BoardOwnershipGuard)
-  findOne(@ParamId() id: string) {
-    return this.boardsService.findOne(id);
+  findOne(@ParamId('boardId') boardId: string) {
+    return this.boardsService.findOne(boardId);
   }
 
-  @Patch(':id')
+  @Patch(':boardId')
   @UseGuards(BoardOwnershipGuard)
-  update(@ParamId() id: string, @Body() updateBoardDto: UpdateBoardDto) {
-    return this.boardsService.update(id, updateBoardDto);
+  update(
+    @ParamId('boardId') boardId: string,
+    @Body() updateBoardDto: UpdateBoardDto,
+  ) {
+    return this.boardsService.update(boardId, updateBoardDto);
   }
 
-  @Delete(':id')
+  @Delete(':boardId')
   @UseGuards(BoardOwnershipGuard)
-  remove(@ParamId() id: string) {
-    return this.boardsService.remove(id);
+  remove(@ParamId('boardId') boardId: string) {
+    return this.boardsService.remove(boardId);
   }
 }

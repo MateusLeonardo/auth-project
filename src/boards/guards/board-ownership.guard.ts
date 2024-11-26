@@ -8,7 +8,7 @@ export class BoardOwnershipGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const userId = request.user.id;
-    const boardId = request.params.id;
+    const boardId = request.params.boardId;
 
     await this.authorizationService.checkBoardOwnership(userId, boardId);
 
