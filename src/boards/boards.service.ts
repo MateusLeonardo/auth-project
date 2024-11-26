@@ -11,25 +11,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BoardsService {
   constructor(private prismaService: PrismaService) {}
 
-  private async validateUserBoard(userId: string, boardId: string) {
-    const board = await this.prismaService.boards.findFirst({
-      where: {
-        id: boardId,
-        userBoards: {
-          some: { userId },
-        },
-      },
-    });
-
-    if (!board) {
-      throw new NotFoundException(
-        'Você não tem acesso a este board ou ele não existe',
-      );
-    }
-
-    return board;
-  }
-
   async create(user: any, { name }: CreateBoardDto) {
     const existsBoard = await this.prismaService.boards.findFirst({
       where: {
@@ -75,38 +56,30 @@ export class BoardsService {
     });
   }
 
-  async findOne(user: any, id: string) {
-    return this.validateUserBoard(user.id, id);
+  async findOne(id: string) {
+    return this.prismaService.boards.findUnique({
+      where: { id },
+    });
   }
 
-  async update(user: any, id: string, { name }: UpdateBoardDto) {
-    await this.validateUserBoard(user.id, id);
-
+  async update(id: string, updateBoardDto: UpdateBoardDto) {
     const existingBoard = await this.prismaService.boards.findFirst({
       where: {
-        name,
-        id: { not: id },
-        userBoards: {
-          some: {
-            userId: user.id,
-          },
-        },
+        id,
       },
     });
 
-    if (existingBoard) {
-      throw new ConflictException('Já existe um board com esse nome');
+    if (!existingBoard) {
+      throw new NotFoundException('Board não existe');
     }
 
     return this.prismaService.boards.update({
       where: { id },
-      data: { name },
+      data: updateBoardDto,
     });
   }
 
-  async remove(user: any, id: string) {
-    await this.validateUserBoard(user.id, id);
-
+  async remove(id: string) {
     try {
       await this.prismaService.boards.delete({
         where: { id },

@@ -13,6 +13,7 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/decorators/user.decorator';
 import { ParamId } from 'src/decorators/param-id.decorator';
+import { BoardOwnershipGuard } from './guards/board-ownership.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('boards')
@@ -30,21 +31,20 @@ export class BoardsController {
   }
 
   @Get(':id')
-  findOne(@User() user, @ParamId() id: string) {
-    return this.boardsService.findOne(user, id);
+  @UseGuards(BoardOwnershipGuard)
+  findOne(@ParamId() id: string) {
+    return this.boardsService.findOne(id);
   }
 
   @Patch(':id')
-  update(
-    @User() user,
-    @ParamId() id: string,
-    @Body() updateBoardDto: UpdateBoardDto,
-  ) {
-    return this.boardsService.update(user, id, updateBoardDto);
+  @UseGuards(BoardOwnershipGuard)
+  update(@ParamId() id: string, @Body() updateBoardDto: UpdateBoardDto) {
+    return this.boardsService.update(id, updateBoardDto);
   }
 
   @Delete(':id')
-  remove(@User() user, @ParamId() id: string) {
-    return this.boardsService.remove(user, id);
+  @UseGuards(BoardOwnershipGuard)
+  remove(@ParamId() id: string) {
+    return this.boardsService.remove(id);
   }
 }
