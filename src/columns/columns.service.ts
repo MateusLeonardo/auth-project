@@ -1,11 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ColumnsService {
-  create(createColumnDto: CreateColumnDto) {
-    return 'This action adds a new column';
+  constructor(private prismaService: PrismaService) {}
+
+  async create(boardId: string, createColumnDto: CreateColumnDto) {
+    const existingColumn = await this.prismaService.columns.findFirst({
+      where: {
+        name: createColumnDto.name,
+        boardId,
+      },
+    });
+
+    if (existingColumn) {
+      throw new ConflictException('Já existe uma coluna com esse nome');
+    }
+
+    try {
+      return this.prismaService.columns.create({
+        data: {
+          ...createColumnDto,
+          board: { connect: { id: boardId } },
+        },
+      });
+    } catch (error: any) {
+      throw new ConflictException(`Erro ao cadastrar coluna: ${error.message}`);
+    }
   }
 
   findAll() {
