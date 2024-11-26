@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { BoardsModule } from './boards/boards.module';
+import { ColumnsModule } from './columns/columns.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BoardsModule } from './boards/boards.module';
       isGlobal: true,
     }),
     BoardsModule,
+    ColumnsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
