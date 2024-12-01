@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { BoardsModule } from './boards/boards.module';
 import { ColumnsModule } from './columns/columns.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ColumnsModule } from './columns/columns.module';
     }),
     BoardsModule,
     ColumnsModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
