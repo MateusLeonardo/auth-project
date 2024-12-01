@@ -21,4 +21,19 @@ export class AuthorizationService {
       );
     }
   }
+
+  async checkColumnOwnership(columnId: string, boardId: string): Promise<void> {
+    const column = await this.prisma.columns.findFirst({
+      where: {
+        id: columnId,
+        boardId: boardId,
+      },
+    });
+
+    if (!column) {
+      throw new ForbiddenException(
+        'Você não tem permissão para acessar esta coluna',
+      );
+    }
+  }
 }
