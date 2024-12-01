@@ -40,7 +40,8 @@ export class ColumnsController {
     return this.columnsService.findOne(columnId);
   }
 
-  @Patch(':id')
+  @Patch(':columnId')
+  @UseGuards(ColumnOwnershipGuard)
   update(
     @ParamId('columnId') columnId: string,
     @Body() updateColumnDto: UpdateColumnDto,
@@ -48,7 +49,8 @@ export class ColumnsController {
     return this.columnsService.update(columnId, updateColumnDto);
   }
 
-  @Delete(':id')
+  @Delete(':columnId')
+  @UseGuards(ColumnOwnershipGuard)
   remove(@ParamId('columnId') columnId: string) {
     return this.columnsService.remove(columnId);
   }

@@ -64,11 +64,33 @@ export class ColumnsService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(columnId: string, updateColumnDto: UpdateColumnDto) {
-    return `This action updates a #${columnId} column`;
+  async update(columnId: string, updateColumnDto: UpdateColumnDto) {
+    const columnExists = await this.prismaService.columns.findFirst({
+      where: {
+        id: columnId,
+      },
+    });
+
+    if (!columnExists) {
+      throw new NotFoundException('Coluna não encontrada');
+    }
+
+    return this.prismaService.columns.update({
+      where: { id: columnId },
+      data: updateColumnDto,
+    });
   }
 
-  remove(columnId: string) {
-    return `This action removes a #${columnId} column`;
+  async remove(columnId: string) {
+    const columnExists = await this.prismaService.columns.findFirst({
+      where: {
+        id: columnId,
+      },
+    });
+
+    if (!columnExists) {
+      throw new NotFoundException('Coluna não encontrada');
+    }
+    return this.prismaService.columns.delete({ where: { id: columnId } });
   }
 }
