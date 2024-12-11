@@ -36,4 +36,19 @@ export class AuthorizationService {
       );
     }
   }
+
+  async checkTaskOwnership(taskId: string, columnId: string): Promise<void> {
+    const task = await this.prisma.tasks.findFirst({
+      where: {
+        id: taskId,
+        columnId,
+      },
+    });
+
+    if (!task) {
+      throw new ForbiddenException(
+        'Você não tem permissão para acessar esta tarefa',
+      );
+    }
+  }
 }
