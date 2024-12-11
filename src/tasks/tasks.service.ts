@@ -66,8 +66,19 @@ export class TasksService {
     return tasks;
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} task`;
+  async findOne(columnId: string, taskId: string) {
+    const task = await this.prismaService.tasks.findUnique({
+      where: {
+        id: taskId,
+        columnId,
+      },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Tarefa não encontrada.');
+    }
+
+    return task;
   }
 
   update(id: string, updateTaskDto: UpdateTaskDto) {

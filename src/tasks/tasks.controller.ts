@@ -35,9 +35,12 @@ export class TasksController {
     return this.tasksService.findAll(columnId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(id);
+  @Get(':taskId')
+  findOne(
+    @ParamId('columnId') columnId: string,
+    @ParamId('taskId') taskId: string,
+  ) {
+    return this.tasksService.findOne(columnId, taskId);
   }
 
   @Patch(':id')
