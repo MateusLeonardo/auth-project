@@ -81,11 +81,42 @@ export class TasksService {
     return task;
   }
 
-  update(id: string, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
+    const task = await this.prismaService.tasks.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    return this.prismaService.tasks.update({
+      where: {
+        id,
+      },
+      data: updateTaskDto,
+    });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} task`;
+  async remove(id: string) {
+    const task = await this.prismaService.tasks.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    await this.prismaService.tasks.delete({
+      where: {
+        id,
+      },
+    });
+
+    return { message: 'Task deleted' };
   }
 }
